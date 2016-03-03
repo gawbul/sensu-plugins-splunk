@@ -1,13 +1,13 @@
 #! /usr/bin/env ruby
 # encoding: UTF-8
 #
-# check-splunk-license-usage
+# check-splunk-service-status
 #
 # DESCRIPTION:
-#   check the level of splunk license usage
+#   check the status of the Splunk service
 #
 # OUTPUT:
-#   check status (ok, warning or critical)
+#   check status (ok or critical)
 #
 # PLATFORMS:
 #   All
@@ -17,8 +17,8 @@
 #   gem: splunk-sdk-ruby
 #
 # USAGE:
-#   check the level of splunk license usage
-#   ./check-splunk-license-usage.rb -h localhost -u admin -p changeme
+#   check the status of the Splunk service
+#   ./check-splunk-service-status.rb -h localhost -u admin -p changeme
 #
 # NOTES:
 #  
@@ -31,7 +31,7 @@
 require 'sensu-plugin/check/cli'
 require 'splunk-sdk-ruby'
 
-class CheckSplunkLicenseUsage < Sensu::Plugin::Check::CLI
+class CheckSplunkServiceStatus < Sensu::Plugin::Check::CLI
   option :hostname,
     description: 'Hostname of the Splunk server to connect to',
     short: '-h',
@@ -64,7 +64,7 @@ class CheckSplunkLicenseUsage < Sensu::Plugin::Check::CLI
     long: '--password PASSWORD',
     required: true
 
-  def check_splunk_server_status
+  def check_splunk_service_status
     # setup connection to Splunk REST service
     begin
       service = Splunk::connect(:host     => config[:hostname],
@@ -73,20 +73,20 @@ class CheckSplunkLicenseUsage < Sensu::Plugin::Check::CLI
                                 :username => config[:username],
                                 :password => config[:password])
     rescue => e
-      critical "#{e.}"
+      critical "Connect error: #{e.message}"
     end
 
     # check if server is up and accepting connections
-    critical "Splunk server is down or not accepting connections" unless service.server_accepting_connections?
+    critical "Splunk service is down or not accepting connections" unless service.server_accepting_connections?
 
-    ok "Splunk server is up and accepting connections"
+    ok "Splunk service is up and accepting connections"
   end
 
   def run
     # sanity check input values
 
     # call splunk license check
-    check_splunk_server_status
+    check_splunk_service_status
   end
 
 end

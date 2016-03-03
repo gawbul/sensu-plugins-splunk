@@ -17,8 +17,8 @@
 #   gem: splunk-sdk-ruby
 #
 # USAGE:
-#   splunk license usage metrics
-#   ./metrics-splunk-license-usage.rb -h localhost -u admin -p changeme -s localhost.splunk
+#   return splunk license usage metrics
+#   ./metrics-splunk-license-usage.rb -h localhost -u admin -p changeme -s 
 #
 # NOTES:
 #   
@@ -75,11 +75,15 @@ class MetricsSplunkLicenseUsage < Sensu::Plugin::Metric::CLI::Graphite
 
 
     # setup connection to Splunk REST service
-    service = Splunk::connect(:host     => config[:hostname],
-                              :port     => config[:port],
-                              :protocol => config[:protocol],
-                              :username => config[:username],
-                              :password => config[:password])
+    begin
+      service = Splunk::connect(:host     => config[:hostname],
+                                :port     => config[:port],
+                                :protocol => config[:protocol],
+                                :username => config[:username],
+                                :password => config[:password])
+    rescue => e
+      critical "Connect error: #{e.message}"
+    end
 
     # retrieve license pool data
     begin
@@ -94,7 +98,11 @@ class MetricsSplunkLicenseUsage < Sensu::Plugin::Metric::CLI::Graphite
     critical "#{response.code} #{response.message}" unless response.code.to_i == 200
 
     # parse atom feed data from response.body
-    atom_data = Splunk::AtomFeed.new(response.body)
+    begin
+      atom_data = Splunk::AtomFeed.new(response.body)
+    rescue => e
+      unknown "AtomFeed error: #{e.message}"
+    end
     atom_data.entries.each do |entry|
       atom_content = entry['content']
 

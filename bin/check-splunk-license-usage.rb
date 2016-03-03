@@ -94,7 +94,7 @@ class CheckSplunkLicenseUsage < Sensu::Plugin::Check::CLI
                                 :username => config[:username],
                                 :password => config[:password])
     rescue => e
-      critical "Splunk connect error: #{e.message}"
+      critical "Connect error: #{e.message}"
     end
 
     # retrieve license pool data
@@ -115,7 +115,7 @@ class CheckSplunkLicenseUsage < Sensu::Plugin::Check::CLI
     begin
       atom_data = Splunk::AtomFeed.new(response.body)
     rescue => e
-      unknown "Splunk atom feed error: #{e.message}"
+      unknown "AtomFeed error: #{e.message}"
     end
     atom_content = atom_data.entries[0]['content']
     effective_quota = atom_content['effective_quota'].to_i
