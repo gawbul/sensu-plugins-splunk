@@ -12,16 +12,16 @@ end
 pvt_key = '~/.ssh/gem-private_key.pem'
 
 Gem::Specification.new do |s|
-  s.authors                = ['Sensu-Plugins and contributors']
-  s.cert_chain             = ['certs/sensu-plugins.pem']
+  s.authors                = ['Steve Moss']
+  s.cert_chain             = ['certs/gem-public_key.pem']
   s.date                   = Date.today.to_s
-  s.description            = 'Sensu splunk plugins'
-  s.email                  = '<sensu-users@googlegroups.com>'
+  s.description            = 'Sensu Splunk plugins'
+  s.email                  = '<gawbul@gmail.com>'
   s.executables            = Dir.glob('bin/**/*.rb').map { |file| File.basename(file) }
   s.files                  = Dir.glob('{bin,lib}/**/*') + %w(LICENSE README.md CHANGELOG.md)
   s.homepage               = 'https://github.com/sensu-plugins/sensu-plugins-splunk'
   s.license                = 'MIT'
-  s.metadata               = { 'maintainer'         => 'sensu-plugin',
+  s.metadata               = { 'maintainer'         => 'steve moss',
                                'development_status' => 'active',
                                'production_status'  => 'unstable - testing recommended',
                                'release_draft'      => 'false',
@@ -33,13 +33,12 @@ Gem::Specification.new do |s|
   s.require_paths          = ['lib']
   s.required_ruby_version  = '>= 1.9.3'
   s.signing_key            = File.expand_path(pvt_key) if $PROGRAM_NAME =~ /gem\z/
-  s.summary                = 'Sensu plugins for splunk'
+  s.summary                = 'Sensu plugins for Splunk'
   s.test_files             = s.files.grep(%r{^(test|spec|features)/})
   s.version                = SensuPluginsSplunk::Version::VER_STRING
 
   s.add_runtime_dependency 'sensu-plugin',      '1.2.0'
-  s.add_runtime_dependency 'json',              '1.8.3'
-  s.add_runtime_dependency 'rest-client',       '1.8.0'
+  s.add_runtime_dependency 'splunk-sdk-ruby',   '1.0.5'
 
   s.add_development_dependency 'codeclimate-test-reporter', '~> 0.4'
   s.add_development_dependency 'rubocop',                   '0.32.1'
