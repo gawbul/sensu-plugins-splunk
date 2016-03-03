@@ -13,7 +13,7 @@ pvt_key = '~/.ssh/gem-private_key.pem'
 
 Gem::Specification.new do |s|
   s.authors                = ['Steve Moss']
-  s.cert_chain             = ['certs/gem-public_key.pem']
+  s.cert_chain             = ['certs/gem-public_cert.pem']
   s.date                   = Date.today.to_s
   s.description            = 'Sensu Splunk plugins'
   s.email                  = '<gawbul@gmail.com>'
