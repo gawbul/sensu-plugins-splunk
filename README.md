@@ -1,4 +1,4 @@
-## Sensu-Plugins-splunk
+## Sensu-Plugins-Splunk
 
 [ ![Build Status](https://travis-ci.org/sensu-plugins/sensu-plugins-splunk.svg?branch=master)](https://travis-ci.org/sensu-plugins/sensu-plugins-splunk)
 [![Gem Version](https://badge.fury.io/rb/sensu-plugins-splunk.svg)](http://badge.fury.io/rb/sensu-plugins-splunk)
@@ -10,15 +10,23 @@
 ## Functionality
 
 ## Files
- * bin/handler-splunkstorm
+ * bin/check-splunk-license-usage.rb
+ * bin/check-splunk-service-status.rb
+ * bin/metrics-splunk-license-usage.rb
 
 ## Usage
 
 ```
 {
-  "splunkstorm": {
-    "project_id": "12345",
-    "access_token": "abcde"
+  "checks": {
+    "check-splunk-service-status": {
+      command: "check-splunk-service-status.rb -h localhost -u admin -p changeme",
+      "subscribers": [
+        "splunk"
+      ],
+      interval: 60,
+      timeout: 10
+    }
   }
 }
 ```
