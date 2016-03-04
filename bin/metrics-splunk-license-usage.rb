@@ -106,13 +106,16 @@ class MetricsSplunkLicenseUsage < Sensu::Plugin::Metric::CLI::Graphite
     atom_data.entries.each do |entry|
       atom_content = entry['content']
 
+      # initial percentage_used to fix NaN due to divide by 0
+      percentage_used = 0.0
+
       # calculate metric values
       description = atom_content['description']
       effective_quota = atom_content['effective_quota'].to_i
       gigabytes_quota = effective_quota / (1024.0 * 1024.0 * 1024.0)
       used_bytes = atom_content['used_bytes'].to_i
       gigabytes_used = used_bytes / (1024.0 * 1024.0 * 1024.0)
-      percentage_used = (used_bytes.to_f / effective_quota.to_f) * 100.0
+      percentage_used = (used_bytes.to_f / effective_quota.to_f) * 100.0 unless effective_quota == 0
 
       # output metrics
       output "#{config[:scheme]}.#{description}.effective_quota", effective_quota
