@@ -102,7 +102,6 @@ class CheckSplunkSearchResults < Sensu::Plugin::Check::CLI
     end
 
     # run search
-    puts config[:searchterm]
     job = service.jobs.create(config[:searchterm],
                               :earliest_time => "-30s",
                               :priority => 5)
