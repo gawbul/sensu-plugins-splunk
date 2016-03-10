@@ -4,7 +4,7 @@
 # check-splunk-search-results
 #
 # DESCRIPTION:
-#   check for a given pattern in the results of a Splunk search
+#   check for a pattern in the results of a Splunk search
 #
 # OUTPUT:
 #   check match(ok or critical)
@@ -17,8 +17,8 @@
 #   gem: splunk-sdk-ruby
 #
 # USAGE:
-#   check the status of the Splunk service
-#   ./check-splunk-search-results.rb -h localhost -u admin -p changeme -st index=_internal " error " NOT debug source=*splunkd.log* -sp -im
+#   check for a pattern in the results of a Splunk search
+#   ./check-splunk-search-results.rb -h localhost -u admin -p changeme -t "index=_internal source=*splunkd.log*" -m ERROR
 #
 # NOTES:
 #  
@@ -70,6 +70,12 @@ class CheckSplunkSearchResults < Sensu::Plugin::Check::CLI
     long: '--term TERM',
     required: true
 
+  option :searchfield,
+    description: 'Field to search in the Splunk search results',
+    short: '-f',
+    long: '--field FIELD',
+    default: '_raw'
+
   option :searchpattern,
     description: 'Pattern to match in the Splunk search results',
     short: '-m',
@@ -96,7 +102,27 @@ class CheckSplunkSearchResults < Sensu::Plugin::Check::CLI
     end
 
     # run search
-    
+    puts config[:searchterm]
+    job = service.jobs.create(config[:searchterm],
+                              :earliest_time => "-30s",
+                              :priority => 5)
+
+    while !job.is_ready? or !job.is_done?
+      sleep(0.2)
+    end
+
+    # parse results
+    reader = Splunk::ResultsReader.new(job.results)
+    critical "Field #{config[:searchfield]} not found in search results" unless reader.fields.include?(config[:searchfield])
+    reader.each do |result|
+      if config[:invertmatch] == false
+        critical "No match for #{config[:searchpattern]}" unless result[config[:searchfield]].include?(config[:searchpattern])
+        ok "Found match for #{config[:searchpattern]}"
+      else
+        ok "No match for #{config[:searchpattern]}" unless result[config[:searchfield]].include?(config[:searchpattern])
+        critical "Found match for #{config[:searchpattern]}"
+      end
+    end
   end
 
   def run
